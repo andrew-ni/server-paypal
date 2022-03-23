@@ -8,6 +8,12 @@ dotenv.config();
 const app = express();
 const port = 4000;
 
+app.use(function(_, res, next) {
+  res.header("Access-Control-Allow-Origin", "localhost:3000"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 const Environment =
   process.env.NODE_ENV === 'production' ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
 const paypalClient = new paypal.core.PayPalHttpClient(
@@ -21,11 +27,15 @@ app.get('/', (req: express.Request, res: express.Response) => {
   });
 });
 
+app.get('/ping', (req: express.Request, res: express.Response) => {
+  console.log(req);
+  res.send('hello');
+});
+
 app.post('/create-order', async (req, res) => {
   console.log('CREATE ORDER');
   console.log(paypalClient, req, res);
 });
-
 
 app.listen(port, () => {
   console.log(`🚀 Server ready at http://localhost:${port}`);
